@@ -28,7 +28,8 @@ const translations = {
     lineHeight: 'Espacement',
     fontFamily: 'Police',
     allTags: 'Tous les mots-clés',
-    saved: 'Sauvegardé'
+    saved: 'Sauvegardé',
+    dailyTracker: 'Suivi quotidien des Wirds'
   },
   en: {
     theme: 'Toggle theme',
@@ -55,7 +56,8 @@ const translations = {
     lineHeight: 'Line Height',
     fontFamily: 'Font Family',
     allTags: 'All Tags',
-    saved: 'Saved'
+    saved: 'Saved',
+    dailyTracker: 'Daily Wirds Tracker'
   },
   ha: {
     theme: 'Canja jigo',
@@ -82,7 +84,8 @@ const translations = {
     lineHeight: 'Tsakanin Layuka',
     fontFamily: 'Rukunin Rubutu',
     allTags: 'Dukkan Alamu',
-    saved: 'Ajiye'
+    saved: 'Ajiye',
+    dailyTracker: 'Bibiyar Wirdo Na Yau'
   }
 };
 

@@ -1,11 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, ReactNode } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Search, Book, Sparkles, Feather, CheckCircle2, Bookmark } from 'lucide-react';
+import { Search, Book, Sparkles, Feather, CheckCircle2, Bookmark, BookmarkCheck, Circle, CheckCircle } from 'lucide-react';
 import { mockPosts, Category, Post } from '../data/mockPosts';
 import { Link } from 'react-router-dom';
 import { useReadPosts } from '../hooks/useReadPosts';
 import { useBookmarks } from '../hooks/useBookmarks';
+import { useWirdsProgress } from '../hooks/useWirdsProgress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 const categoryIcons = {
   wirds: <Book className="w-4 h-4" />,
@@ -20,7 +22,8 @@ export function UserHome() {
   const [selectedTag, setSelectedTag] = useState<string>('all');
   
   const { readPosts } = useReadPosts();
-  const { bookmarks } = useBookmarks();
+  const { bookmarks, toggleBookmark } = useBookmarks();
+  const { completedWirds, toggleWird } = useWirdsProgress();
 
   // Get unique tags across all posts
   const allTags = useMemo(() => {
@@ -52,6 +55,9 @@ export function UserHome() {
     return mockPosts[today % mockPosts.length];
   }, []);
 
+  const wirdsList = useMemo(() => mockPosts.filter(p => p.category === 'wirds'), []);
+  const progressPercentage = Math.round((completedWirds.length / (wirdsList.length || 1)) * 100);
+
   return (
     <div className="max-w-5xl mx-auto pt-8">
       {/* Daily Reflection Section */}
@@ -75,6 +81,52 @@ export function UserHome() {
         <Link to={`/post/${dailyPost.id}`} className="relative z-10 shrink-0 inline-flex items-center justify-center w-full md:w-auto gap-2 bg-white text-emerald-800 px-5 py-2.5 md:py-2 rounded-xl text-sm font-bold hover:bg-emerald-50 transition-colors shadow-sm">
           {t('readMore')} &rarr;
         </Link>
+      </div>
+
+      {/* Progress Tracker Widget */}
+      <div className="mb-10 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+            {t('dailyTracker') || 'Daily Wirds Tracker'}
+          </h3>
+          <span className="text-sm font-bold text-slate-500">
+            {progressPercentage}%
+          </span>
+        </div>
+        
+        {/* Progress Bar */}
+        <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full mb-6 overflow-hidden">
+          <div 
+            className="h-full bg-emerald-500 transition-all duration-500"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+
+        {/* Checkboxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {wirdsList.map(wird => {
+            const isDone = completedWirds.includes(wird.id);
+            return (
+              <button
+                key={wird.id}
+                onClick={() => toggleWird(wird.id)}
+                className={`flex items-center gap-3 p-3 text-left rounded-xl border transition-all ${
+                  isDone 
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/50 dark:bg-emerald-900/20 dark:text-emerald-300' 
+                    : 'border-slate-100 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50'
+                }`}
+              >
+                <div className={`shrink-0 ${isDone ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-300 dark:text-slate-600'}`}>
+                  {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                </div>
+                <span className={`text-sm font-medium line-clamp-1 ${isDone ? '' : 'text-slate-700 dark:text-slate-300'}`}>
+                  {wird.title[language]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Search and Filter Section */}
@@ -149,7 +201,14 @@ export function UserHome() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {filteredPosts.map((post) => (
             <div key={post.id}>
-              <PostCard post={post} language={language} t={t} isRead={readPosts.includes(post.id)} />
+              <PostCard 
+                post={post} 
+                language={language} 
+                t={t} 
+                isRead={readPosts.includes(post.id)} 
+                isBookmarked={bookmarks.includes(post.id)}
+                onToggleBookmark={() => toggleBookmark(post.id)}
+              />
             </div>
           ))}
         </div>
@@ -163,7 +222,7 @@ export function UserHome() {
   );
 }
 
-function CategoryButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon?: React.ReactNode, label: string }) {
+function CategoryButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon?: ReactNode, label: string }) {
   return (
     <button
       onClick={onClick}
@@ -179,7 +238,7 @@ function CategoryButton({ active, onClick, icon, label }: { active: boolean, onC
   );
 }
 
-function PostCard({ post, language, t, isRead }: { post: Post, language: 'en' | 'fr' | 'ha', t: any, isRead: boolean }) {
+function PostCard({ post, language, t, isRead, isBookmarked, onToggleBookmark }: { post: Post, language: 'en' | 'fr' | 'ha', t: any, isRead: boolean, isBookmarked: boolean, onToggleBookmark: () => void }) {
   const isDarkCategory = post.category === 'asrar';
   const isBlueCategory = post.category === 'wirds';
   
@@ -190,9 +249,8 @@ function PostCard({ post, language, t, isRead }: { post: Post, language: 'en' | 
       : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
 
   return (
-    <Link to={`/post/${post.id}`} className="block h-full group">
-      <div className={`relative flex flex-col h-full bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border ${isRead ? 'border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-800'} hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 cursor-pointer overflow-hidden`}>
-        
+    <div className={`relative flex flex-col h-full bg-white dark:bg-slate-900 rounded-3xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-800'} hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 group`}>
+      <div className="p-6 md:p-8 flex-grow flex flex-col relative z-10 block">
         {isRead && (
           <div className="absolute top-0 right-0 p-4">
             <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-1 rounded-md text-xs font-bold shadow-sm">
@@ -207,15 +265,29 @@ function PostCard({ post, language, t, isRead }: { post: Post, language: 'en' | 
             {categoryIcons[post.category]}
             {t(post.category)}
           </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleBookmark();
+            }}
+            className={`rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 ${isBookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}
+          >
+            {isBookmarked ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
+          </Button>
         </div>
         
-        <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-          {post.title[language]}
-        </h3>
-        
-        <p className="text-slate-600 dark:text-slate-400 pb-6 flex-grow leading-relaxed">
-          {post.excerpt[language]}
-        </p>
+        <Link to={`/post/${post.id}`} className="group-hover:opacity-90">
+          <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+            {post.title[language]}
+          </h3>
+          
+          <p className="text-slate-600 dark:text-slate-400 pb-6 flex-grow leading-relaxed">
+            {post.excerpt[language]}
+          </p>
+        </Link>
         
         <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800/80 mt-auto">
           <div className="flex items-center gap-2">
@@ -226,16 +298,18 @@ function PostCard({ post, language, t, isRead }: { post: Post, language: 'en' | 
               {post.author}
             </span>
           </div>
-          <span className="text-sm font-bold text-emerald-600 dark:text-emerald-500 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-            {t('readMore')} &rarr;
-          </span>
-        </div>
-
-        {/* Progress Bar indicator for read status */}
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800">
-          <div className={`h-full bg-emerald-500 transition-all duration-700 ${isRead ? 'w-full' : 'w-0'}`}></div>
+          <Link to={`/post/${post.id}`}>
+            <span className="text-sm font-bold text-emerald-600 dark:text-emerald-500 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 cursor-pointer">
+              {t('readMore')} &rarr;
+            </span>
+          </Link>
         </div>
       </div>
-    </Link>
+
+      {/* Progress Bar indicator for read status */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-b-3xl overflow-hidden">
+        <div className={`h-full bg-emerald-500 transition-all duration-700 ${isRead ? 'w-full' : 'w-0'}`}></div>
+      </div>
+    </div>
   );
 }

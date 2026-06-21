@@ -111,5 +111,49 @@ export const mockPosts: Post[] = [
     tags: ['difficulties', 'latif', 'relief'],
     author: 'Cheikh Ahmed',
     date: '2023-08-05'
+  },
+  {
+    id: '5',
+    title: {
+      fr: 'Secret de Ya Razzaq pour une richesse inattendue',
+      en: 'Secret of Ya Razzaq for unexpected wealth',
+      ha: 'Sirrin Ya Razzak don samun arziki daga inda ba a zata ba',
+    },
+    category: 'asrar',
+    excerpt: {
+      fr: 'Un outil avancé pour attirer les opportunités d\'affaires et la prospérité de manière fulgurante.',
+      en: 'An advanced tool to attract business opportunities and prosperity in a dazzling way.',
+      ha: 'Wani babban asiri don jan hankalin damar kasuwanci da ci gaba a cikin hanzari.',
+    },
+    content: {
+      fr: 'Le nom Al-Razzaq (Le Pourvoyeur) est la clé de la subsistance.\n\nCe secret caché demande une grande pureté spirituelle. Il s\'agit de faire une prière de 4 rakaats au milieu de la nuit. Dans chaque rakaat après Al-Fatiha, lisez la Sourate Al-Waqi\'ah.\n\nAprès le salam, récitez Ya Razzaq 313 fois. Ce nombre correspond aux messagers d\'Allah. Les effets sur l\'ouverture financière sont souvent décrits comme miraculeux.',
+      en: 'The name Al-Razzaq (The Provider) is the key to sustenance.\n\nThis hidden secret requires great spiritual purity. It involves performing a 4-rakaat prayer in the middle of the night. In each rakaat after Al-Fatiha, read Surah Al-Waqi\'ah.\n\nAfter the salam, recite Ya Razzaq 313 times. This number corresponds to the messengers of Allah. The effects on financial opening are often described as miraculous.',
+      ha: 'Sunan Al-Razzak (Mai ciyarwa) shine mabudin arziki.\n\nWannan boyayyen sirrin yana bukatar tsarki mai girma. Ana yin sallah raka\'a 4 a tsakiyar dare. A kowace raka\'a bayan Fatiha, a karanta suratu Al-Waqi\'ah.\n\nBayan sallama, a karanta Ya Razzak sau 313. Wannan adadin ya dace da manzannin Allah. Tasirin da yake da shi wajen bude kofar kudi sau da yawa ana kallonsa a matsayin mu\'ujiza.',
+    },
+    tags: ['wealth', 'razzaq', 'advanced', 'hidden'],
+    author: 'Cheikh Tidiane',
+    date: '2023-11-20'
+  },
+  {
+    id: '6',
+    title: {
+      fr: 'Asrar caché de Ayatul Kursi (Protection Absolue)',
+      en: 'Hidden Asrar of Ayatul Kursi (Absolute Protection)',
+      ha: 'Boyayyen Asirin Ayatul Kursi (Kariya gaba daya)',
+    },
+    category: 'asrar',
+    excerpt: {
+      fr: 'Une méthode d\'élite pour ériger une muraille spirituelle impénétrable autour de soi-même et de ses biens.',
+      en: 'An elite method to build an impenetrable spiritual wall around yourself and your possessions.',
+      ha: 'Wata fitacciyar hanya ta gina katangar ruhaniya mai karfi a kusa da kai da dukiyarka.',
+    },
+    content: {
+      fr: 'Cet outil est considéré comme l\'un des secrets les plus avancés de la protection.\n\nIl consiste en une récitation très spécifique d\'Ayatul Kursi. Vous devez écrire le verset sur une ardoise en bois avec de l\'encre de safran et d\'eau de rose.\n\nEnsuite, récitez le verset 313 fois (le nombre des compagnons de Badr). Une fois terminé, lavez l\'ardoise et buvez l\'eau ou aspergez-la autour de votre maison. Cela crée une forteresse contre la jalousie et les énergies négatives.',
+      en: 'This tool is considered one of the most advanced secrets of protection.\n\nIt consists of a very specific recitation of Ayatul Kursi. You must write the verse on a wooden slate with saffron ink and rose water.\n\nThen, recite the verse 313 times (the number of the companions of Badr). Once finished, wash the slate and drink the water or sprinkle it around your house. This creates a fortress against jealousy and negative energies.',
+      ha: 'Ana kallon wannan a matsayin daya daga cikin asirin kariya mafi ci gaba.\n\nYa kunshi karatun ayatul Kursi na musamman. Dole ne ku rubuta ayar a kan allon katako da tawadar za\'afaran da ruwan fure.\n\nSannan ka karanta ayar sau 313 (adadin sahabban Badr). Da zarar an gama, a wanke allon a sha ruwan ko a yayyafa shi a kewayen gida. Wannan yana haifar da kagara game da kishi da kuzari mara kyau.',
+    },
+    tags: ['protection', 'kursi', 'advanced', 'hidden'],
+    author: 'Imam Youssef',
+    date: '2023-12-05'
   }
 ];
