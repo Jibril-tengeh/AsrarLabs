@@ -1,6 +1,6 @@
 import { useState, useMemo, ReactNode } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Search, Book, Sparkles, Feather, CheckCircle2, Bookmark, BookmarkCheck, Circle, CheckCircle } from 'lucide-react';
+import { Search, Book, Sparkles, Feather, CheckCircle2, Bookmark, BookmarkCheck, Circle, CheckCircle, LayoutGrid, Square, LayoutList } from 'lucide-react';
 import { mockPosts, Category, Post } from '../data/mockPosts';
 import { Link } from 'react-router-dom';
 import { useReadPosts } from '../hooks/useReadPosts';
@@ -20,6 +20,7 @@ export function UserHome() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all' | 'saved'>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
+  const [layout, setLayout] = useState<'grid' | 'single' | 'list'>('single');
   
   const { readPosts } = useReadPosts();
   const { bookmarks, toggleBookmark } = useBookmarks();
@@ -180,25 +181,58 @@ export function UserHome() {
             />
           </div>
 
-          <div className="w-full md:w-48">
-            <Select value={selectedTag} onValueChange={setSelectedTag}>
-              <SelectTrigger className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl">
-                <SelectValue placeholder={t('allTags')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('allTags')}</SelectItem>
-                {allTags.map(tag => (
-                  <SelectItem key={tag} value={tag}>#{tag}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="w-full md:w-56 lg:w-64">
+              <Select value={selectedTag} onValueChange={setSelectedTag}>
+                <SelectTrigger className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl">
+                  <SelectValue placeholder={t('allTags')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('allTags')}</SelectItem>
+                  {allTags.map(tag => (
+                    <SelectItem key={tag} value={tag}>#{tag}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1 border border-slate-200 dark:border-slate-800 rounded-xl shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`w-9 h-9 text-slate-500 rounded-lg ${layout === 'grid' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'hover:text-slate-900 dark:hover:text-white'}`}
+                onClick={() => setLayout('grid')}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`w-9 h-9 text-slate-500 rounded-lg ${layout === 'single' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'hover:text-slate-900 dark:hover:text-white'}`}
+                onClick={() => setLayout('single')}
+              >
+                <Square className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`w-9 h-9 text-slate-500 rounded-lg ${layout === 'list' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'hover:text-slate-900 dark:hover:text-white'}`}
+                onClick={() => setLayout('list')}
+              >
+                <LayoutList className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Posts Grid */}
       {filteredPosts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div className={`grid gap-6 ${
+          layout === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2' : 
+          layout === 'single' ? 'grid-cols-1 max-w-2xl mx-auto' :
+          'grid-cols-1'
+        }`}>
           {filteredPosts.map((post) => (
             <div key={post.id}>
               <PostCard 
@@ -208,6 +242,7 @@ export function UserHome() {
                 isRead={readPosts.includes(post.id)} 
                 isBookmarked={bookmarks.includes(post.id)}
                 onToggleBookmark={() => toggleBookmark(post.id)}
+                layout={layout}
               />
             </div>
           ))}
@@ -238,7 +273,7 @@ function CategoryButton({ active, onClick, icon, label }: { active: boolean, onC
   );
 }
 
-function PostCard({ post, language, t, isRead, isBookmarked, onToggleBookmark }: { post: Post, language: 'en' | 'fr' | 'ha', t: any, isRead: boolean, isBookmarked: boolean, onToggleBookmark: () => void }) {
+function PostCard({ post, language, t, isRead, isBookmarked, onToggleBookmark, layout = 'grid' }: { post: Post, language: 'en' | 'fr' | 'ha', t: any, isRead: boolean, isBookmarked: boolean, onToggleBookmark: () => void, layout?: 'grid' | 'single' | 'list' }) {
   const isDarkCategory = post.category === 'asrar';
   const isBlueCategory = post.category === 'wirds';
   
@@ -247,6 +282,87 @@ function PostCard({ post, language, t, isRead, isBookmarked, onToggleBookmark }:
     : isBlueCategory 
       ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
       : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
+
+  if (layout === 'list') {
+    return (
+      <div className={`relative flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white dark:bg-slate-900 rounded-3xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-800'} hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-lg transition-all duration-300 group p-5 overflow-hidden`}>
+        
+        {/* Progress Bar indicator for read status */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800 z-0">
+          <div className={`h-full bg-emerald-500 transition-all duration-700 ${isRead ? 'w-full' : 'w-0'}`}></div>
+        </div>
+
+        <div className="flex-grow min-w-0 z-10 w-full">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase ${bgBadgeClass}`}>
+                {categoryIcons[post.category]}
+                {t(post.category)}
+              </span>
+              {isRead && (
+                <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-1 rounded-md text-xs font-bold shadow-sm">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span className="hidden sm:inline">{t('readStatus')}</span>
+                </div>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="sm:hidden"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleBookmark();
+              }}
+            >
+              {isBookmarked ? <BookmarkCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> : <Bookmark className="w-5 h-5 text-slate-400" />}
+            </Button>
+          </div>
+          
+          <Link to={`/post/${post.id}`} className="group-hover:opacity-90 block">
+            <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-2 leading-tight truncate">
+              {post.title[language]}
+            </h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 mb-3 sm:mb-0">
+              {post.excerpt[language]}
+            </p>
+          </Link>
+        </div>
+
+        <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto shrink-0 sm:pl-4 sm:border-l border-slate-100 dark:border-slate-800 z-10">
+           <div className="flex items-center gap-2 sm:mb-4">
+              <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300">
+                {post.author.charAt(0)}
+              </div>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                {post.author}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex h-8 w-8"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onToggleBookmark();
+                }}
+              >
+                {isBookmarked ? <BookmarkCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> : <Bookmark className="w-5 h-5 text-slate-400" />}
+              </Button>
+              <Link to={`/post/${post.id}`}>
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-500 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 cursor-pointer">
+                  &rarr;
+                </span>
+              </Link>
+            </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative flex flex-col h-full bg-white dark:bg-slate-900 rounded-3xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-800'} hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 group`}>
